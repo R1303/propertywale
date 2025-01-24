@@ -47,18 +47,14 @@ build_services:
     - cd ..
   artifacts:
     paths:
-      - UserService/target/*.jar
-      - ServerService/target/*.jar
-      - PropertyService/target/*.jar
-      - GatewayService/target/*.jar
-      - ConsumerService/target/*.jar
+      - UserService/UserService/target/*.jar
     expire_in: 1 day
 
 # Deploy stage: Upload artifacts to GitLab Package Registry
 deploy_services:
   stage: deploy
   variables:
-    DEPLOY_CURL_COMMAND: 'curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" --upload-file "service1/target/*.jar" "$GITLAB_API_URL/$GITLAB_PROJECT_ID/packages/generic/service1/1.0.0/service1.jar"'
+    DEPLOY_CURL_COMMAND: 'curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" --upload-file "UserService/UserService/target/*.jar" "$GITLAB_API_URL/$GITLAB_PROJECT_ID/packages/generic/UserService/1.0.0/UserService.jar"'
   script:
     # Deploy Service 1
     - echo "Deploying User Service"
