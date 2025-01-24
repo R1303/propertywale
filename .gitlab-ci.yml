@@ -1,0 +1,67 @@
+image: maven:latest
+
+stages:
+  - build
+  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+  GITLAB_API_URL: "https://gitlab.com/api/v4/projects"
+  GITLAB_PROJECT_ID: $CI_PROJECT_ID
+  GITLAB_PRIVATE_TOKEN: $CI_JOB_TOKEN
+
+cache:
+  paths:
+    - .m2/repository
+
+# Build stage: Compile and package all services
+build_services:
+  stage: build
+  script:
+    # Build each service
+    - echo "Building User Service"
+    - cd UserService
+    - cd UserService
+    - mvn clean package $MAVEN_CLI_OPTS
+    - cd ..
+    - echo "Building Server Service"
+    - cd ServerService
+    - cd ServerService
+    - mvn clean package $MAVEN_CLI_OPTS
+    - cd ..
+    - echo "Building Property Service"
+    - cd PropertyService
+    - cd PropertyService
+    - mvn clean package $MAVEN_CLI_OPTS
+    - cd ..
+    - echo "Building Gateway Service"
+    - cd GatewayService
+    - cd GatewayService
+    - mvn clean package $MAVEN_CLI_OPTS
+    - cd ..
+    - echo "Building Consumer Service"
+    - cd ConsumerService
+    - cd ConsumerService
+    - mvn clean package $MAVEN_CLI_OPTS
+    - cd ..
+  artifacts:
+    paths:
+      - UserService/target/*.jar
+      - ServerService/target/*.jar
+      - PropertyService/target/*.jar
+      - GatewayService/target/*.jar
+      - ConsumerService/target/*.jar
+    expire_in: 1 day
+
+# Deploy stage: Upload artifacts to GitLab Package Registry
+deploy_services:
+  stage: deploy
+  variables:
+    DEPLOY_CURL_COMMAND: 'curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" --upload-file "service1/target/*.jar" "$GITLAB_API_URL/$GITLAB_PROJECT_ID/packages/generic/service1/1.0.0/service1.jar"'
+  script:
+    # Deploy Service 1
+    - echo "Deploying User Service"
+    - echo $DEPLOY_CURL_COMMAND
+  only:
+    - propertywale_24012025
