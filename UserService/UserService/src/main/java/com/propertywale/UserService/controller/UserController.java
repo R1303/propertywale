@@ -27,9 +27,9 @@ public class UserController {
 		return ResponseEntity.ok("User Registered");
 	}
 
-	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
-		return ResponseEntity.ok("Login Successful");
+	@GetMapping("/my_details")
+	public ResponseEntity<?> login() {
+		return ResponseEntity.ok("Rajan Rana");
 	}
 	
 	@GetMapping("/getUser/{userId}")
