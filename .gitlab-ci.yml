@@ -25,26 +25,6 @@ build_services:
     - cd UserService
     - mvn clean package $MAVEN_CLI_OPTS
     - cd ..
-    - echo "Building Server Service"
-    - cd ServerService
-    - cd ServerService
-    - mvn clean package $MAVEN_CLI_OPTS
-    - cd ..
-    - echo "Building Property Service"
-    - cd PropertyService
-    - cd PropertyService
-    - mvn clean package $MAVEN_CLI_OPTS
-    - cd ..
-    - echo "Building Gateway Service"
-    - cd GatewayService
-    - cd GatewayService
-    - mvn clean package $MAVEN_CLI_OPTS
-    - cd ..
-    - echo "Building Consumer Service"
-    - cd ConsumerService
-    - cd ConsumerService
-    - mvn clean package $MAVEN_CLI_OPTS
-    - cd ..
   artifacts:
     paths:
       - UserService/UserService/target/*.jar
