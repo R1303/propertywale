@@ -1,0 +1,70 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
+  MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version"
+  GITLAB_API_URL: "https://gitlab.com/api/v4/projects"
+  GITLAB_PROJECT_ID: $CI_PROJECT_ID
+  GITLAB_PRIVATE_TOKEN: $CI_JOB_TOKEN
+
+cache:
+  paths:
+    - .m2/repository
+
+# Build stage: Compile and package all services
+build_services:
+  stage: build
+  script:
+    # Build each service
+    - echo "Building User Service"
+    - cd UserService
+    - mvn clean package $MAVEN_CLI_OPTS
+    - cd ..
+    - echo "Building Server Service"
+    - cd ServerService
+    - mvn clean package $MAVEN_CLI_OPTS
+    - cd ..
+    - echo "Building Property Service"
+    - cd PropertyService
+    - mvn clean package $MAVEN_CLI_OPTS
+    - cd ..
+    - echo "Building Gateway Service"
+    - cd GatewayService
+    - mvn clean package $MAVEN_CLI_OPTS
+    - cd ..
+    - echo "Building Consumer Service"
+    - cd ConsumerService
+    - mvn clean package $MAVEN_CLI_OPTS
+    - cd ..
+  artifacts:
+    paths:
+      - UserService/target/*.jar
+      - ServerService/target/*.jar
+      - PropertyService/target/*.jar
+      - GatewayService/target/*.jar
+      - ConsumerService/target/*.jar
+    expire_in: 1 day
+
+# Deploy stage: Upload artifacts to GitLab Package Registry
+deploy_services:
+  stage: deploy
+  script:
+    # Deploy Service 1
+    - echo "Deploying User Service"
+    - curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" --upload-file UserService/target/*.jar "$GITLAB_API_URL/$GITLAB_PROJECT_ID/packages/generic/UserService/1.0.0/UserService.jar"
+    # Deploy Service 2
+    - echo "Deploying Server Service"
+    - curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" --upload-file ServerService/target/*.jar "$GITLAB_API_URL/$GITLAB_PROJECT_ID/packages/generic/ServerService/1.0.0/ServerService.jar"
+    # Deploy Service 3
+    - echo "Deploying Property Service"
+    - curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" --upload-file PropertyService/target/*.jar "$GITLAB_API_URL/$GITLAB_PROJECT_ID/packages/generic/PropertyService/1.0.0/PropertyService.jar"
+    # Deploy Service 4
+    - echo "Deploying Gateway Service"
+    - curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" --upload-file GatewayService/target/*.jar "$GITLAB_API_URL/$GITLAB_PROJECT_ID/packages/generic/GatewayService/1.0.0/GatewayService.jar"
+    # Deploy Service 5
+    - echo "Deploying Consumer Service"
+    - curl --header "PRIVATE-TOKEN: $GITLAB_PRIVATE_TOKEN" --upload-file ConsumerService/target/*.jar "$GITLAB_API_URL/$GITLAB_PROJECT_ID/packages/generic/ConsumerService/1.0.0/ConsumerService.jar"
+  only:
+    - propertywale_24012025
